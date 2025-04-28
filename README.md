@@ -1,6 +1,6 @@
 # HelloWorld
 
-[Connecting humans across borders](./assets/placeholder-logo.png)
+[Connecting humans across borders](assets/logo.png)
 
 ## Project Overview
 

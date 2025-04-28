@@ -1,0 +1,28 @@
+{
+  "name": "2800-202510-dtc04",
+  "version": "1.0.0",
+  "description": "[Connecting humans across borders](assets/logo.png)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crombout89/2800-202510-DTC04.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crombout89/2800-202510-DTC04/issues"
+  },
+  "homepage": "https://github.com/crombout89/2800-202510-DTC04#readme",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
