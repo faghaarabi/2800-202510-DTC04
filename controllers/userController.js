@@ -1,10 +1,21 @@
-// userController.js
 const User = require('../models/User');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); // Add JWT for login
 
 class UserController {
-  // User registration method
+
+  async getAllUsers(req, res) {
+    try {
+        const users = await User.find({}).select('-password');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ 
+            message: 'Error retrieving users', 
+            error: error.message 
+        });
+    }
+  }
+
   async registerUser(req, res) {
     try {
       const { username, email, password, interests, connectionGoals } = req.body;
@@ -36,12 +47,9 @@ class UserController {
       // Save user to database
       const savedUser = await newUser.save();
 
-      // Remove password from response
-      savedUser.password = undefined;
-
       res.status(201).json({
         message: 'User registered successfully',
-        user: savedUser
+        userId: savedUser._id
       });
 
     } catch (error) {
@@ -52,7 +60,6 @@ class UserController {
     }
   }
 
-  // Add login method
   async loginUser(req, res) {
     try {
       const { email, password } = req.body;
@@ -60,64 +67,85 @@ class UserController {
       // Find user by email
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ 
+          message: 'Invalid credentials',
+          redirect: '/login'
+        });
       }
   
       // Check password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        return res.status(400).json({ 
+          message: 'Invalid credentials',
+          redirect: '/login'
+        });
       }
   
-      // Create token
-      const token = jwt.sign(
-        { id: user._id }, 
-        process.env.JWT_SECRET, 
-        { expiresIn: '1h' }
-      );
-  
-      // Send token in response
+      // Send user details
       res.json({ 
         message: 'Login successful',
-        token 
+        userId: user._id,
+        username: user.username,
+        email: user.email,
+        redirect: '/profile'
       });
     } catch (error) {
       res.status(500).json({ 
         message: 'Error logging in', 
-        error: error.message 
-      });
-    }
-  }  
-
-  async getUserProfile(req, res) {
-    try {
-      // Find user by ID, excluding sensitive information
-      const user = await User.findById(req.user.id)
-        .select('-password -__v');
-  
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      res.render('profile', { 
-        user: user,
-        title: `${user.username}'s Profile` 
-      });
-    } catch (error) {
-      res.status(500).json({ 
-        message: 'Error retrieving profile', 
-        error: error.message 
+        error: error.message,
+        redirect: '/login'
       });
     }
   }
+
+  async getUserProfile(req, res) {
+    try {
+      const userId = req.query.userId;
+      console.log('Requested User ID:', userId);
+      
+      // Check if it's a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ 
+          message: 'Invalid User ID',
+          redirect: '/login'
+        });
+      }
+
+      // Find user by ID
+      const user = await User.findById(userId);
   
-  // Add this to exports
-  getUserProfile
+      console.log('Database Query User:', user);
+
+      if (!user) {
+        return res.status(404).json({ 
+          message: 'User not found',
+          redirect: '/login'
+        });
+      }
+  
+      // Return user details
+      return res.json({ 
+        user: {
+          username: user.username,
+          email: user.email,
+          interests: user.interests,
+          connectionGoals: user.connectionGoals
+        }
+      });
+    } catch (error) {
+      console.error('Profile retrieval ERROR:', error);
+      res.status(500).json({ 
+        message: 'Error retrieving profile', 
+        error: error.message,
+        redirect: '/login'
+      });
+    }
+}
 }
 
-// Export methods directly
 module.exports = {
   registerUser: (req, res) => new UserController().registerUser(req, res),
   loginUser: (req, res) => new UserController().loginUser(req, res),
-  getUserProfile: (req, res) => new UserController().getUserProfile(req, res) 
+  getUserProfile: (req, res) => new UserController().getUserProfile(req, res)
 };

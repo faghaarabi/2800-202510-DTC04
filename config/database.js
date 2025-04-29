@@ -3,11 +3,8 @@ require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    // Use environment variable for database connection
-    const conn = await mongoose.connect(process.env.DATABASE_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // Remove deprecated options
+    const conn = await mongoose.connect(process.env.DATABASE_URL);
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
@@ -18,5 +15,4 @@ const connectDB = async () => {
   }
 };
 
-// Export the connection function
 module.exports = connectDB;

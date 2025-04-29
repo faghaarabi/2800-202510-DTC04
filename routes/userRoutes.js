@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser, getUserProfile } = require('../controllers/userController');
-const authMiddleware = require('../middleware/authMiddleware');
+const userController = require('../controllers/userController');
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
-
-// Direct profile route
-router.get('/profile', authMiddleware, getUserProfile);
+// Update routes to use the imported controller directly
+router.post('/login', userController.loginUser);
+router.post('/register', userController.registerUser);
+router.get('/profile', userController.getUserProfile);
+router.get('/all-users', userController.getAllUsers || ((req, res) => {
+    res.status(501).json({ message: 'Not implemented' });
+}));
 
 module.exports = router;
