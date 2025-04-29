@@ -6,9 +6,27 @@ class UserController {
 
   async getAllUsers(req, res) {
     try {
+        // Find all users, but exclude sensitive information like password
         const users = await User.find({}).select('-password');
-        res.json(users);
+        
+        // If no users found, return an appropriate message
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+
+        // Return users
+        res.json({
+            count: users.length,
+            users: users.map(user => ({
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                interests: user.interests,
+                connectionGoals: user.connectionGoals
+            }))
+        });
     } catch (error) {
+        console.error('Error retrieving users:', error);
         res.status(500).json({ 
             message: 'Error retrieving users', 
             error: error.message 
@@ -62,13 +80,23 @@ class UserController {
 
   async loginUser(req, res) {
     try {
+      console.log('Login Request Body:', req.body); // Add detailed logging
       const { email, password } = req.body;
+  
+      // Validate input
+      if (!email || !password) {
+        return res.status(400).json({ 
+          message: 'Email and password are required',
+          redirect: '/login'
+        });
+      }
   
       // Find user by email
       const user = await User.findOne({ email });
       if (!user) {
+        console.log(`Login attempt failed: No user found with email ${email}`);
         return res.status(400).json({ 
-          message: 'Invalid credentials',
+          message: 'Invalid email or password',
           redirect: '/login'
         });
       }
@@ -76,8 +104,9 @@ class UserController {
       // Check password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
+        console.log(`Login attempt failed: Incorrect password for email ${email}`);
         return res.status(400).json({ 
-          message: 'Invalid credentials',
+          message: 'Invalid email or password',
           redirect: '/login'
         });
       }
@@ -85,12 +114,13 @@ class UserController {
       // Send user details
       res.json({ 
         message: 'Login successful',
-        userId: user._id,
+        userId: user._id.toString(), // Ensure this is a string
         username: user.username,
         email: user.email,
         redirect: '/profile'
       });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({ 
         message: 'Error logging in', 
         error: error.message,
@@ -147,5 +177,6 @@ class UserController {
 module.exports = {
   registerUser: (req, res) => new UserController().registerUser(req, res),
   loginUser: (req, res) => new UserController().loginUser(req, res),
-  getUserProfile: (req, res) => new UserController().getUserProfile(req, res)
+  getUserProfile: (req, res) => new UserController().getUserProfile(req, res),
+  getAllUsers: (req, res) => new UserController().getAllUsers(req, res)
 };

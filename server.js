@@ -38,20 +38,26 @@ connectDB();
 const corsOptions = {
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin || 
-            origin === 'http://localhost:3000' || 
-            origin === 'http://127.0.0.1:3000') {
+        const allowedOrigins = [
+            'http://localhost:3000', 
+            'http://127.0.0.1:3000',
+            'http://localhost:3000/',
+            'http://127.0.0.1:3000/',
+            undefined, // for same-origin requests
+            null       // for same-origin requests
+        ];
+
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
     credentials: true,
     optionsSuccessStatus: 200
 };
-app.use(cors(corsOptions));
 
 // Logging middleware
 app.use(morgan('dev')); // Detailed request logging
