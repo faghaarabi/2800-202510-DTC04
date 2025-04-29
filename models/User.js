@@ -1,19 +1,41 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  username: { 
-    type: String, 
-    required: true, 
-    unique: true 
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    minlength: 3,
+    maxlength: 30
   },
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true 
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
   },
-  interests: [String],
-  connectionGoals: [String],
-  // Add more fields as per project requirements
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+  interests: [{
+    type: String,
+    trim: true
+  }],
+  connectionGoals: [{
+    type: String,
+    trim: true
+  }],
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('User', UserSchema);

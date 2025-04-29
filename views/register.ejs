@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+</head>
+<body>
+    <h2>User Registration</h2>
+    <form action="/api/users/register" method="POST">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="email" name="email" placeholder="Email" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        
+        <h3>Interests (select multiple):</h3>
+        <input type="checkbox" name="interests" value="Travel"> Travel<br>
+        <input type="checkbox" name="interests" value="Language Exchange"> Language Exchange<br>
+        <input type="checkbox" name="interests" value="Cultural Learning"> Cultural Learning<br>
+
+        <h3>Connection Goals (select multiple):</h3>
+        <input type="checkbox" name="connectionGoals" value="Make Friends"> Make Friends<br>
+        <input type="checkbox" name="connectionGoals" value="Professional Networking"> Professional Networking<br>
+        <input type="checkbox" name="connectionGoals" value="Language Practice"> Language Practice<br>
+
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>

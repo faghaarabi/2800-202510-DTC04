@@ -1,15 +1,15 @@
+// routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
+const { registerUser, loginUser } = require('../controllers/userController');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// Placeholder routes
-router.post('/register', (req, res) => {
-  // User registration logic
-  res.json({ message: 'User registration endpoint' });
-});
+router.post('/register', registerUser);
+router.post('/login', loginUser);
 
-router.post('/login', (req, res) => {
-  // User login logic
-  res.json({ message: 'User login endpoint' });
+// Example of a protected route
+router.get('/profile', authMiddleware, (req, res) => {
+  res.json(req.user);
 });
 
 module.exports = router;
