@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+</head>
+<body>
+    <div class="profile-container">
+        <h1>User Profile</h1>
+        
+        <div class="profile-header">
+            <img 
+                src="<%= user.profilePicture || '/default-profile.png' %>" 
+                alt="Profile Picture"
+            >
+            <div>
+                <h2><%= user.username %></h2>
+                <p><%= user.email %></p>
+            </div>
+        </div>
+
+        <div class="profile-bio">
+            <h3>About Me</h3>
+            <p><%= user.bio || 'No bio available' %></p>
+        </div>
+
+        <div class="profile-interests">
+            <h3>Interests</h3>
+            <% if (user.interests && user.interests.length > 0) { %>
+                <ul>
+                    <% user.interests.forEach(interest => { %>
+                        <li><%= interest %></li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No interests added</p>
+            <% } %>
+        </div>
+
+        <div class="profile-goals">
+            <h3>Connection Goals</h3>
+            <% if (user.connectionGoals && user.connectionGoals.length > 0) { %>
+                <ul>
+                    <% user.connectionGoals.forEach(goal => { %>
+                        <li><%= goal %></li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No connection goals added</p>
+            <% } %>
+        </div>
+
+        <div class="profile-actions">
+            <a href="/users/edit-profile">Edit Profile</a>
+        </div>
+    </div>
+</body>
+</html>

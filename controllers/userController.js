@@ -56,47 +56,68 @@ class UserController {
   async loginUser(req, res) {
     try {
       const { email, password } = req.body;
-
+  
       // Find user by email
       const user = await User.findOne({ email });
       if (!user) {
         return res.status(400).json({ message: 'Invalid credentials' });
       }
-
+  
       // Check password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).json({ message: 'Invalid credentials' });
       }
-
-      // Create JWT token
+  
+      // Create token
       const token = jwt.sign(
         { id: user._id }, 
         process.env.JWT_SECRET, 
         { expiresIn: '1h' }
       );
-
-      res.json({
+  
+      // Send token in response
+      res.json({ 
         message: 'Login successful',
-        token,
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email
-        }
+        token 
       });
-
     } catch (error) {
       res.status(500).json({ 
         message: 'Error logging in', 
         error: error.message 
       });
     }
+  }  
+
+  async getUserProfile(req, res) {
+    try {
+      // Find user by ID, excluding sensitive information
+      const user = await User.findById(req.user.id)
+        .select('-password -__v');
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.render('profile', { 
+        user: user,
+        title: `${user.username}'s Profile` 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        message: 'Error retrieving profile', 
+        error: error.message 
+      });
+    }
   }
+  
+  // Add this to exports
+  getUserProfile
 }
 
 // Export methods directly
 module.exports = {
   registerUser: (req, res) => new UserController().registerUser(req, res),
-  loginUser: (req, res) => new UserController().loginUser(req, res)
+  loginUser: (req, res) => new UserController().loginUser(req, res),
+  getUserProfile: (req, res) => new UserController().getUserProfile(req, res) 
 };

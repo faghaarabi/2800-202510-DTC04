@@ -33,6 +33,24 @@ const UserSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  bio: {
+    type: String,
+    trim: true,
+    maxlength: 500
+  },
+  location: {
+    type: String,
+    trim: true
+  },
+  age: {
+    type: Number,
+    min: 18,
+    max: 100
+  },
+  profilePicture: {
+    type: String,
+    default: '/default-profile.png'
   }
 }, {
   timestamps: true
